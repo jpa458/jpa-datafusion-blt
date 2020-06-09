@@ -88,10 +88,26 @@ public class BusinessLogicTransformation extends Transform<StructuredRecord, Str
     // Add all the values to the builder
     for (Schema.Field field : input.getSchema().getFields()) {
       String fieldName = field.getName();
-      String inputValue = input.get(fieldName).toString();
-      builder.set(fieldName, inputValue);
+      if (input.get(fieldName) != null) {
+        String inputValue = input.get(fieldName).toString();
+        builder.set(fieldName, inputValue);
+      }
     }
-    // If you wanted to make additional changes to the output record, this might be a good place to do it.
+
+    String value = input.get("VOLDAAN");
+    String output = "";
+    if ( value != null ) {
+      if ( value.equals('0') ) {
+        output = "Niet Voldaan";
+      } else if ( value.equals("") ){
+        output = "Voldaan onbekend";
+      } else if ( value.equals("J") ) {
+        output = "Voldaan";
+      } else if ( value.equals("N") ) {
+        output = "Niet voldaan";
+      }
+      builder.set("status_display_original", output);
+    }
 
     // Finally, build and emit the record.
     emitter.emit(builder.build());
@@ -140,4 +156,3 @@ public class BusinessLogicTransformation extends Transform<StructuredRecord, Str
     }
   }
 }
-
